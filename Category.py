@@ -2,6 +2,8 @@ from Book import Book
 
 class Category:
     def __init__(self, category_name, books_list):
+
+        #Vérification des types
         if isinstance(category_name, str):
             pass
         else:
@@ -15,6 +17,7 @@ class Category:
         self.category_name = category_name
         self.books_list = books_list
 
+    #Méthode qui retourne une liste des livres disponibles dans la catégorie
     def available_books(self):
         available_books = []
         for book in self.books_list:
@@ -22,6 +25,7 @@ class Category:
                 available_books.append(book)
         return available_books
 
+    #Emprunter un livre
     def borrow(self, title):
         searched_book = None
         for book in self.books_list:
@@ -38,6 +42,7 @@ class Category:
             searched_book.available = False
             return searched_book
                 
+    #Retourner un livre
     def return_book(self, returned_book):
         for book in self.books_list:
             if book == returned_book:

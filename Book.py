@@ -1,5 +1,7 @@
 class Book:
     def __init__(self, title, author, year, available):
+
+        #Vérification des types
         if isinstance(title, str):
             pass
         else:
@@ -25,6 +27,7 @@ class Book:
         self.year = year
         self.available = available
     
+    #Méthode pour afficher les infos d'un livre
     def show_book(self):
         availability = "Disponible" if self.available == True else "Indisponible"
         print(f"{self.title} de {self.author} paru en {self.year} -- {availability}")

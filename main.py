@@ -2,34 +2,88 @@ from Book import Book
 from Category import Category
 from Library import Library
 
-liste_livres = []
+FILE_PATH = "books.csv"
 
-livre1 = Book("TITRE1", "james", 1995, True)
-livre2 = Book("TITRE2", "james", 1996, True)
-livre3 = Book("TITRE3", "james", 1997, True)
-livre4 = Book("TITRE4", "james", 1998, False)
-livre5 = Book("TITRE5", "james", 1999, True)
+def load_and_initialize_categories(filepath):
 
-liste_livres.append(livre1)
-liste_livres.append(livre2)
-liste_livres.append(livre3)
-liste_livres.append(livre4)
-liste_livres.append(livre5)
+    """
+    Initialisation du .CSV chatgptéisé car je n'arrivais pas a regrouper les livres par catégorie
+    """
 
-liste_cat = []
-cat = Category("livres cools", liste_livres)
-liste_cat.append(cat)
+    categories_list = [] 
+    
+    try:
+        with open(filepath, 'r', encoding='utf-8') as f:
+            
+            for line in f:
+                try:
+                    line = line.strip()
+                    if not line: 
+                        continue
 
-bibli = Library(liste_cat)
+                    parts = [part.strip() for part in line.split(';')]
+                    if len(parts) != 5:
+                        raise ValueError("Ligne n'a pas 5 colonnes.")
+                        
+                    category_name, title, author, year_str, available_str = parts
+                    
+                    book = Book(title, author, int(year_str), available_str.lower() == 'yes')
 
-livre2.show_book()
+                    found_category = None
 
-emprunt = cat.borrow("titre2")
+                    for cat in categories_list:
+                        if cat.category_name == category_name: 
+                            found_category = cat
+                            break
+                    
+                    if found_category:
+                        found_category.books_list.append(book) 
 
-livre2.show_book()
+                    else:
+                        new_cat = Category(category_name, [book]) 
+                        categories_list.append(new_cat)
 
-print(bibli.total_available())
+                except (ValueError, TypeError) as e:
+                    print(f"Erreur : {e}")
+                    
+    except FileNotFoundError:
+        print(f"Erreur : fichier non trouvé")
+        return None
 
-cat.return_book(emprunt)
+    return categories_list
 
-print(bibli.total_available())
+
+#MAIN :
+final_categories = load_and_initialize_categories(FILE_PATH)
+
+if not final_categories:
+    raise Exception("Erreur de chargement des données")
+    
+library = Library(final_categories)
+
+print("Début.....")
+
+emprunt = None
+
+try:
+    print(f"Livres disponibles avant toute action :  {library.total_available()}")
+
+    emprunt = library.borrow_book('Roman', 'Bel-Ami')
+
+    print(f"Livres disponibles après l'emprunt : {library.total_available()}")
+
+    library.borrow_book('Roman', 'Bel-Ami')
+
+except (TypeError, Exception) as e:
+    print(f"Erreur : {e}")
+
+try:
+    library.return_book('Roman', emprunt)
+
+    print(f"Livres disponibles apres le retour du livre : {library.total_available()}")
+    
+except (TypeError, Exception) as e:
+    print(f"Erreur : {e}")
+
+
+
